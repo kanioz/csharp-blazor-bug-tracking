@@ -1,4 +1,5 @@
 <h3>All Bugs</h3>
+
 <table>
     <thead>
         <tr>
@@ -11,10 +12,10 @@
     @foreach (var bug in Bugs)
     {
         <tr>
-            <th>@bug.Id</th>
-            <th>@bug.Title</th>
-            <th>@bug.Description</th>
-            <th>@bug.Priority</th>
+            <td>@bug.Id</td>
+            <td>@bug.Title</td>
+            <td>@bug.Description</td>
+            <td>@bug.Priority</td>
         </tr>
     }
 </table>
