@@ -1,19 +1,20 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS base
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
 
-ENV APP_DIR /src/app
-
-RUN mkdir -p ${APP_DIR}
-
-RUN addgroup -S projects && adduser -S projects -G projects
-
-WORKDIR ${APP_DIR}
-
+FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
+WORKDIR /src
+COPY ["BugTrackerUI/BugTrackerUI.csproj", "BugTrackerUI/"]
+RUN dotnet restore "BugTrackerUI/BugTrackerUI.csproj"
 COPY . .
+WORKDIR "/src/BugTrackerUI"
+RUN dotnet build "BugTrackerUI.csproj" -c Release -o /app/build
 
-RUN chown -R projects:projects /src/app
+FROM build AS publish
+RUN dotnet publish "BugTrackerUI.csproj" -c Release -o /app/publish
 
-USER projects
-
-RUN dotnet build
-
-ENTRYPOINT ["/bin/sh"]
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "BugTrackerUI.dll"]
